@@ -17,49 +17,48 @@ function codeGeneratorEan13($num): string
     return "{$code}{$checksum}";
 }
 
+$file = file_get_contents(__DIR__ . "/testStorage/input_data/Otchet_inventarizaciya.csv");
+$fileConverted = iconv('windows-1251', 'utf-8', $file);
+
+$fileData = explode(PHP_EOL, $fileConverted);
 $result = [];
 
-$xml = simplexml_load_string($fileContent);
+for ($i = 2, $count = count($fileData); $i < $count; $i++) {
+    $item = explode(";", $fileData[$i]);
+    $internalProductCode = $item[1];
+    $productBarcode = codeGeneratorEan13($item[1]);
+    $productCodeForUKTZED = '';
+    $serviceCodeDKPP = '';
+    $nameOfGoods = $item[3];
+    $unitCode = '';
+    $nameOfTheUnitOfMeasurement = 'шт';
+    $price = str_replace(' ', '', mb_substr($item[5], 0, -7));
+    $letterPDV = '';
+    $ratePDV = '';
+    $collectionLetter = '';
+    $feeRate = '';
+    $exciseStampMark = '';
 
-foreach ($xml->previewpages->page0 as $value) {
-    foreach ($value->b2 as $item) {
-        if ($item->m12['u'] == '') {
-            continue;
-        }
-        $internalProductCode = $item->m12['u'];
-        $productBarcode = codeGeneratorEan13($internalProductCode);
-        $productCodeForUKTZED = '';
-        $serviceCodeDKPP = '';
-        $nameOfGoods = $item->m9['u'];
-        $unitCode = '';
-        $nameOfTheUnitOfMeasurement = 'шт';
-        $price = str_replace(' ', '', mb_substr($item->m10['u'], 0, -7));
-        $letterPDV = '';
-        $ratePDV = '';
-        $collectionLetter = '';
-        $feeRate = '';
-        $exciseStampMark = '';
-
-        $dataItem = [
-            $internalProductCode,
-            $productBarcode,
-            $productCodeForUKTZED,
-            $serviceCodeDKPP,
-            $nameOfGoods,
-            $unitCode,
-            $nameOfTheUnitOfMeasurement,
-            $price,
-            $letterPDV,
-            $ratePDV,
-            $collectionLetter,
-            $feeRate,
-            $exciseStampMark,
-        ];
-        $result[] = implode(';', $dataItem);
-    }
+    $dataItem = [
+        $internalProductCode,
+        $productBarcode,
+        $productCodeForUKTZED,
+        $serviceCodeDKPP,
+        $nameOfGoods,
+        $unitCode,
+        $nameOfTheUnitOfMeasurement,
+        $price,
+        $letterPDV,
+        $ratePDV,
+        $collectionLetter,
+        $feeRate,
+        $exciseStampMark,
+    ];
+    $result[] = implode(';', $dataItem);
 }
 
 $userFormat = implode("\n", $result);
+echo $userFormat;
 
 //    $headings = [
 //        "Внутрішній код товару",
@@ -78,5 +77,3 @@ $userFormat = implode("\n", $result);
 //    ];
 //    $tableHead = implode(';', $headings);
 //    $result[] = $tableHead;
-
-
