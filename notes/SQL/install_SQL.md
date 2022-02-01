@@ -1,13 +1,14 @@
 ### Installation
 ```
 macos: brew install postgresql
-ubuntu: apt install postgresql
+ubuntu: sudo apt install postgresql postgresql-contrib
 windows: choco install postgresql
 ```
 ***
 ### Connection Postgres
 ```SQL
 $ sudo apt-get install php-pgsql
+$ sudo -i -u postgres
 $ psql {{ db_name }}
     bd_name=> ALTER USER {{ user_name }} with encrypted password 'password';
     bd_name=> \q;

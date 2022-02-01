@@ -17,49 +17,54 @@ function codeGeneratorEan13($num): string
     return "{$code}{$checksum}";
 }
 
+$fileContent = file_get_contents(__DIR__ . "/testStorage/input_data/store.csv");
+
+$file = iconv('windows-1251', 'utf-8', $fileContent);
+
 $result = [];
+$collectionStore = explode(PHP_EOL, $file);
 
-$xml = simplexml_load_string($fileContent);
+for ($i = 2, $count = count($collectionStore); $i < $count - 1; $i++) {
+    
+    $item = explode(';', $collectionStore[$i]);
 
-foreach ($xml->previewpages->page0 as $value) {
-    foreach ($value->b2 as $item) {
-        if ($item->m12['u'] == '') {
-            continue;
-        }
-        $internalProductCode = $item->m12['u'];
-        $productBarcode = codeGeneratorEan13($internalProductCode);
-        $productCodeForUKTZED = '';
-        $serviceCodeDKPP = '';
-        $nameOfGoods = $item->m9['u'];
-        $unitCode = '';
-        $nameOfTheUnitOfMeasurement = 'шт';
-        $price = str_replace(' ', '', mb_substr($item->m10['u'], 0, -7));
-        $letterPDV = '';
-        $ratePDV = '';
-        $collectionLetter = '';
-        $feeRate = '';
-        $exciseStampMark = '';
+    $internalProductCode = $item[1];
+    $productBarcode = codeGeneratorEan13($item[1]);
+    $productCodeForUKTZED = '';
+    $serviceCodeDKPP = '';
+    $nameOfGoods = $item[3];
+    $unitCode = '';
+    $nameOfTheUnitOfMeasurement = 'шт';
+    $price = mb_substr($item[8], 0, -7);;
+    $letterPDV = '';
+    $ratePDV = '';
+    $collectionLetter = '';
+    $feeRate = '';
+    $exciseStampMark = '';
 
-        $dataItem = [
-            $internalProductCode,
-            $productBarcode,
-            $productCodeForUKTZED,
-            $serviceCodeDKPP,
-            $nameOfGoods,
-            $unitCode,
-            $nameOfTheUnitOfMeasurement,
-            $price,
-            $letterPDV,
-            $ratePDV,
-            $collectionLetter,
-            $feeRate,
-            $exciseStampMark,
-        ];
-        $result[] = implode(';', $dataItem);
+    $dataItem = [
+        $internalProductCode,
+        $productBarcode,
+        $productCodeForUKTZED,
+        $serviceCodeDKPP,
+        $nameOfGoods,
+        $unitCode,
+        $nameOfTheUnitOfMeasurement,
+        $price,
+        $letterPDV,
+        $ratePDV,
+        $collectionLetter,
+        $feeRate,
+        $exciseStampMark,
+    ];
+    if ($dataItem[0] == 0) {
+        continue;
     }
+    $result[] = implode(';', $dataItem);
 }
 
-$userFormat = implode("\n", $result);
+$userFormat = implode(PHP_EOL, $result);
+echo $userFormat;
 
 //    $headings = [
 //        "Внутрішній код товару",
@@ -78,5 +83,3 @@ $userFormat = implode("\n", $result);
 //    ];
 //    $tableHead = implode(';', $headings);
 //    $result[] = $tableHead;
-
-
