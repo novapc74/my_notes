@@ -17,6 +17,7 @@ function codeGeneratorEan13($num): string
     return "{$code}{$checksum}";
 }
 
+<<<<<<< HEAD
 $fileContent = file_get_contents(__DIR__ . "/testStorage/input_data/store.csv");
 
 $file = iconv('windows-1251', 'utf-8', $fileContent);
@@ -28,6 +29,16 @@ for ($i = 2, $count = count($collectionStore); $i < $count - 1; $i++) {
     
     $item = explode(';', $collectionStore[$i]);
 
+=======
+$file = file_get_contents(__DIR__ . "/testStorage/input_data/Otchet_inventarizaciya.csv");
+$fileConverted = iconv('windows-1251', 'utf-8', $file);
+
+$fileData = explode(PHP_EOL, $fileConverted);
+$result = [];
+
+for ($i = 2, $count = count($fileData); $i < $count; $i++) {
+    $item = explode(";", $fileData[$i]);
+>>>>>>> 74ebdf963ba99787b536e0bb9f60a9a0344e7f32
     $internalProductCode = $item[1];
     $productBarcode = codeGeneratorEan13($item[1]);
     $productCodeForUKTZED = '';
@@ -35,7 +46,11 @@ for ($i = 2, $count = count($collectionStore); $i < $count - 1; $i++) {
     $nameOfGoods = $item[3];
     $unitCode = '';
     $nameOfTheUnitOfMeasurement = 'шт';
+<<<<<<< HEAD
     $price = mb_substr($item[8], 0, -7);;
+=======
+    $price = str_replace(' ', '', mb_substr($item[5], 0, -7));
+>>>>>>> 74ebdf963ba99787b536e0bb9f60a9a0344e7f32
     $letterPDV = '';
     $ratePDV = '';
     $collectionLetter = '';
@@ -57,6 +72,7 @@ for ($i = 2, $count = count($collectionStore); $i < $count - 1; $i++) {
         $feeRate,
         $exciseStampMark,
     ];
+<<<<<<< HEAD
     if ($dataItem[0] == 0) {
         continue;
     }
@@ -64,6 +80,12 @@ for ($i = 2, $count = count($collectionStore); $i < $count - 1; $i++) {
 }
 
 $userFormat = implode(PHP_EOL, $result);
+=======
+    $result[] = implode(';', $dataItem);
+}
+
+$userFormat = implode("\n", $result);
+>>>>>>> 74ebdf963ba99787b536e0bb9f60a9a0344e7f32
 echo $userFormat;
 
 //    $headings = [
