@@ -6,7 +6,7 @@
 ***
 ### Laravel
 ***
-### PHP lighte
+### PHP_Lite
 ***
 ### Scripts
 ***
